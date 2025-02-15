@@ -1,10 +1,10 @@
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
-  name: your-ip
+  name: example-app
   namespace: flux-system
 spec:
-  image: ibnuislamy/your_ip
+  image: shidqis/example-app
   interval: 30s
   secretRef:
     name: dockerhub-key
@@ -13,11 +13,11 @@ spec:
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
-  name: your-ip
+  name: example-app
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: your-ip
+    name: example-app
   policy:
     semver:
       range: '>=0.0.1'
@@ -26,7 +26,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: your-ip-configs
+  name: example-app-configs
   namespace: playground-dfgjkt
 type: Opaque
 stringData:
@@ -38,39 +38,39 @@ stringData:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: your-ip
+  name: example-app
   namespace: playground-dfgjkt
   labels:
-    app: your-ip
+    app: example-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: your-ip
+      app: example-app
   template:
     metadata:
       labels:
-        app: your-ip
+        app: example-app
     spec:
       imagePullSecrets:
         - name: dockerhub-key
       containers:
-        - name: your-ip
-          image: ibnuislamy/your_ip:1.0.2 # {"$imagepolicy": "flux-system:your-ip"}
+        - name: example-app
+          image: shidqis/your_ip:1.0.2 # {"$imagepolicy": "flux-system:example-app"}
           ports:
             - containerPort: 3000
           envFrom:
             - secretRef:
-                name: "your-ip-configs"
+                name: "example-app-configs"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: your-ip
+  name: example-app
   namespace: playground-dfgjkt
   labels:
-    app: your-ip
+    app: example-app
 spec:
   type: ClusterIP
   ports:
@@ -79,13 +79,13 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: your-ip
+    app: example-app
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: your-ip
+  name: example-app
   namespace: playground-dfgjkt
 spec:
   rules:
@@ -96,7 +96,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: your-ip
+                name: example-app
                 port:
                   number: 80
   ingressClassName: traefik
